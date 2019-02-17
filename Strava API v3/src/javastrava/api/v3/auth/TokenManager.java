@@ -217,7 +217,8 @@ public class TokenManager {
 			throw new IllegalArgumentException(Messages.string("TokenManager.1")); //$NON-NLS-1$
 		}
 		if (token.getAthlete().getEmail() == null) {
-			throw new IllegalArgumentException(Messages.string("TokenManager.2")); //$NON-NLS-1$
+			token.getAthlete().setEmail(String.valueOf(token.getAthlete().getId()));
+			//throw new IllegalArgumentException(Messages.string("TokenManager.2")); //$NON-NLS-1$
 		}
 		if (token.getScopes() == null) {
 			throw new IllegalArgumentException(Messages.string("TokenManager.3")); //$NON-NLS-1$
