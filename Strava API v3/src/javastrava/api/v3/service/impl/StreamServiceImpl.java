@@ -145,20 +145,20 @@ public class StreamServiceImpl extends StravaServiceImpl implements StreamServic
 	}
 
 	/**
-	 * @see javastrava.api.v3.service.StreamService#getActivityStreams(java.lang.Integer)
+	 * @see javastrava.api.v3.service.StreamService#getActivityStreams(java.lang.Long)
 	 */
 	@Override
-	public List<StravaStream> getActivityStreams(final Integer activityId) {
+	public List<StravaStream> getActivityStreams(final Long activityId) {
 		return getActivityStreams(activityId, null, null, getAllStreamTypes());
 	}
 
 	/**
-	 * @see javastrava.api.v3.service.StreamService#getActivityStreams(Integer,
+	 * @see javastrava.api.v3.service.StreamService#getActivityStreams(Long,
 	 *      StravaStreamResolutionType, StravaStreamSeriesDownsamplingType,
 	 *      StravaStreamType...)
 	 */
 	@Override
-	public List<StravaStream> getActivityStreams(final Integer activityId, final StravaStreamResolutionType resolution,
+	public List<StravaStream> getActivityStreams(final Long activityId, final StravaStreamResolutionType resolution,
 			final StravaStreamSeriesDownsamplingType seriesType, final StravaStreamType... types) {
 		StravaStreamType[] typesToGet = types;
 		validateArguments(resolution, seriesType, typesToGet);
@@ -202,20 +202,20 @@ public class StreamServiceImpl extends StravaServiceImpl implements StreamServic
 	}
 
 	/**
-	 * @see javastrava.api.v3.service.StreamService#getActivityStreamsAsync(java.lang.Integer)
+	 * @see javastrava.api.v3.service.StreamService#getActivityStreamsAsync(java.lang.Long)
 	 */
 	@Override
-	public CompletableFuture<List<StravaStream>> getActivityStreamsAsync(final Integer activityId) {
+	public CompletableFuture<List<StravaStream>> getActivityStreamsAsync(final Long activityId) {
 		return StravaServiceImpl.future(() -> {
 			return getActivityStreams(activityId);
 		});
 	}
 
 	/**
-	 * @see javastrava.api.v3.service.StreamService#getActivityStreamsAsync(java.lang.Integer, javastrava.api.v3.model.reference.StravaStreamResolutionType, javastrava.api.v3.model.reference.StravaStreamSeriesDownsamplingType, javastrava.api.v3.model.reference.StravaStreamType[])
+	 * @see javastrava.api.v3.service.StreamService#getActivityStreamsAsync(java.lang.Long, javastrava.api.v3.model.reference.StravaStreamResolutionType, javastrava.api.v3.model.reference.StravaStreamSeriesDownsamplingType, javastrava.api.v3.model.reference.StravaStreamType[])
 	 */
 	@Override
-	public CompletableFuture<List<StravaStream>> getActivityStreamsAsync(final Integer activityId, final StravaStreamResolutionType resolution,
+	public CompletableFuture<List<StravaStream>> getActivityStreamsAsync(final Long activityId, final StravaStreamResolutionType resolution,
 			final StravaStreamSeriesDownsamplingType seriesType, final StravaStreamType... types) {
 		return StravaServiceImpl.future(() -> {
 			return getActivityStreams(activityId, resolution, seriesType, types);
