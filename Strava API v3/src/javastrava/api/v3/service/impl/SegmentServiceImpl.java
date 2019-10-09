@@ -408,7 +408,7 @@ public class SegmentServiceImpl extends StravaServiceImpl implements SegmentServ
 
 		// // TODO Workaround for issue javastrava-api #71 (see
 		// https://github.com/danshannon/javastravav3api/issues/71)
-		// if (!this.getToken().hasViewPrivate()) {
+		// if (!this.getAccessToken().hasViewPrivate()) {
 		// final List<StravaSegment> filteredSegments = new
 		// ArrayList<StravaSegment>();
 		// for (final StravaSegment segment : segments) {

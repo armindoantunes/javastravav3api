@@ -36,7 +36,18 @@ public class AuthorisationServiceImpl implements AuthorisationService {
 	 */
 	@Override
 	public Token tokenExchange(final Integer clientId, final String clientSecret, final String code, final AuthorisationScope... scopes) throws BadRequestException, UnauthorizedException {
-		final TokenResponse response = this.api.tokenExchange(clientId, clientSecret, code);
+		final TokenResponse response = this.api.tokenExchange(clientId, clientSecret, "authorization_code", code);
+		final Token token = new Token(response, scopes);
+		TokenManager.instance().storeToken(token);
+		return token;
+	}
+
+	/**
+	 * @see javastrava.api.v3.auth.AuthorisationService#tokenExchange(java.lang.Integer, java.lang.String, java.lang.String, AuthorisationScope...)
+	 */
+	@Override
+	public Token tokenRefresh(final Integer clientId, final String clientSecret, final String refreshToken, final AuthorisationScope... scopes) throws BadRequestException, UnauthorizedException {
+		final TokenResponse response = this.api.tokenRefresh(clientId, clientSecret, "refresh_token", refreshToken);
 		final Token token = new Token(response, scopes);
 		TokenManager.instance().storeToken(token);
 		return token;

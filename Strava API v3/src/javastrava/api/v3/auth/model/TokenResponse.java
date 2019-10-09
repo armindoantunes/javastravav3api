@@ -3,6 +3,9 @@ package javastrava.api.v3.auth.model;
 import javastrava.api.v3.model.StravaAthlete;
 import javastrava.api.v3.rest.API;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 /**
  * <p>
  * The TokenResponse is returned by authorisation services; it contains user details and the access token which is then used for authentication purposes for all
@@ -27,6 +30,10 @@ public class TokenResponse {
 	 */
 	private StravaAthlete athlete;
 
+	private String refreshToken;
+
+	private long expiresAt;
+
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -47,6 +54,13 @@ public class TokenResponse {
 				return false;
 			}
 		} else if (!this.accessToken.equals(other.accessToken)) {
+			return false;
+		}
+		if (this.refreshToken == null) {
+			if (other.refreshToken!= null) {
+				return false;
+			}
+		} else if (!this.refreshToken.equals(other.refreshToken)) {
 			return false;
 		}
 		if (this.athlete == null) {
@@ -74,6 +88,13 @@ public class TokenResponse {
 	}
 
 	/**
+	 * @return the refreshToken
+	 */
+	public String getRefreshToken() {
+		return this.refreshToken;
+	}
+
+	/**
 	 * @return the athlete
 	 */
 	public StravaAthlete getAthlete() {
@@ -88,6 +109,13 @@ public class TokenResponse {
 	}
 
 	/**
+	 * @return seconds since the Epoch when the provided access token will expire
+	 */
+	public long getExpiresAt() {
+		return this.expiresAt;
+	}
+
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -95,6 +123,7 @@ public class TokenResponse {
 		final int prime = 31;
 		int result = 1;
 		result = (prime * result) + ((this.accessToken == null) ? 0 : this.accessToken.hashCode());
+		result = (prime * result) + ((this.refreshToken == null) ? 0 : this.refreshToken.hashCode());
 		result = (prime * result) + ((this.athlete == null) ? 0 : this.athlete.hashCode());
 		result = (prime * result) + ((this.tokenType == null) ? 0 : this.tokenType.hashCode());
 		return result;
@@ -106,6 +135,14 @@ public class TokenResponse {
 	 */
 	public void setAccessToken(final String accessToken) {
 		this.accessToken = accessToken;
+	}
+
+	/**
+	 * @param refreshToken
+	 *            the refresh token to set
+	 */
+	public void setRefreshToken(final String refreshToken) {
+		this.refreshToken= refreshToken;
 	}
 
 	/**
@@ -125,11 +162,21 @@ public class TokenResponse {
 	}
 
 	/**
+	 * @param expiresAt
+	 *            seconds since the Epoch when the provided access token will expire.
+	 */
+	public void setExpiresAt(final long expiresAt) {
+		this.expiresAt = expiresAt;
+	}
+
+	/**
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "TokenResponse [accessToken=" + this.accessToken + ", tokenType=" + this.tokenType + ", athlete=" + this.athlete + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "TokenResponse [accessToken=" + this.accessToken + ", refreshToken=" + this.refreshToken + ", expires=" +
+				LocalDateTime.ofEpochSecond(this.expiresAt, 0, ZoneOffset.UTC) +
+				", tokenType=" + this.tokenType + ", athlete=" + this.athlete + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 }

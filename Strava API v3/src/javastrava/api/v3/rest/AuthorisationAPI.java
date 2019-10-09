@@ -24,6 +24,8 @@ public interface AuthorisationAPI {
 	 *            application's ID, obtained during registration
 	 * @param clientSecret
 	 *            application's secret, obtained during registration
+	 * @param grantType
+	 *            "authorization_code"
 	 * @param code
 	 *            authorisation code
 	 * @return Returns an access_token and a detailed representation of the current athlete.
@@ -33,5 +35,25 @@ public interface AuthorisationAPI {
 	@FormUrlEncoded
 	@POST("/oauth/token")
 	public TokenResponse tokenExchange(@Field("client_id") final Integer clientId, @Field("client_secret") final String clientSecret,
-			@Field("code") final String code) throws BadRequestException, UnauthorizedException;
+			@Field("grant_type") final String grantType, @Field("code") final String code) throws BadRequestException, UnauthorizedException;
+
+	/**
+	 * @see javastrava.api.v3.auth.AuthorisationService#tokenExchange(java.lang.Integer, java.lang.String, java.lang.String, AuthorisationScope...)
+	 *
+	 * @param clientId
+	 *            application's ID, obtained during registration
+	 * @param clientSecret
+	 *            application's secret, obtained during registration
+	 * @param grantType
+	 *            "refresh_token"
+	 * @param refreshToken
+	 *            refresh token
+	 * @return Returns an access_token and a detailed representation of the current athlete.
+	 * @throws BadRequestException Where the request does not contain all the required information
+	 * @throws UnauthorizedException If client secret is invalid
+	 */
+	@FormUrlEncoded
+	@POST("/oauth/token")
+	public TokenResponse tokenRefresh(@Field("client_id") final Integer clientId, @Field("client_secret") final String clientSecret,
+									   @Field("grant_type") final String grantType, @Field("refresh_token") final String refreshToken) throws BadRequestException, UnauthorizedException;
 }

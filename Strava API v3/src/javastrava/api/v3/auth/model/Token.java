@@ -1,5 +1,7 @@
 package javastrava.api.v3.auth.model;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -36,13 +38,13 @@ import javastrava.api.v3.service.impl.WebhookServiceImpl;
  * </p>
  *
  * <p>
- * A token is used to acquire an implementation of each of the service objects that sub-class {@link StravaServiceImpl}
+ * A access token is used to acquire an implementation of each of the service objects that sub-class {@link StravaServiceImpl}
  * </p>
  *
  * <p>
- * Tokens are acquired through the OAuth process; this implementation of the API does not provide a purely programmatic way to acquire a token as that would
+ * Tokens are acquired through the OAuth process; this implementation of the API does not provide a purely programmatic way to acquire a access token as that would
  * kind of destroy the point(!) - although once a user has given their permission to the application via the OAuth process, you can use
- * {@link AuthorisationService#tokenExchange(Integer, String, String, AuthorisationScope...)} to acquire a token at that point in the process.
+ * {@link AuthorisationService#tokenExchange(Integer, String, String, AuthorisationScope...)} to acquire a access token at that point in the process.
  * </p>
  *
  * <p>
@@ -61,22 +63,22 @@ import javastrava.api.v3.service.impl.WebhookServiceImpl;
  */
 public class Token {
 	/**
-	 * The {@link StravaAthlete athlete} to whom this token is assigned
+	 * The {@link StravaAthlete athlete} to whom this accessToken is assigned
 	 */
 	private StravaAthlete athlete;
 
 	/**
-	 * The value of the access token, which is used in requests issued via the API
+	 * The value of the access Token, which is used in requests issued via the API
 	 */
-	private String token;
+	private String accessToken;
 
 	/**
-	 * List of {@link AuthorisationScope authorisation scopes} granted for this token
+	 * List of {@link AuthorisationScope authorisation scopes} granted for this accessToken
 	 */
 	private List<AuthorisationScope> scopes;
 
 	/**
-	 * List of service implementations associated with this token
+	 * List of service implementations associated with this accessToken
 	 */
 	private HashMap<Class<? extends StravaService>, StravaService> services;
 
@@ -84,6 +86,13 @@ public class Token {
 	 * Token type used in the authorisation header of requests to the Strava API - usually set to "Bearer"
 	 */
 	private String tokenType;
+
+	/**
+	 * The value of the refresh Token, which is used in requests issued via the API
+	 */
+	private String refreshToken;
+
+	private long expiresAt;
 
 	/**
 	 * No-args constructor
@@ -101,11 +110,13 @@ public class Token {
 	 * @param tokenResponse
 	 *            The response as received from {@link AuthorisationService#tokenExchange(Integer, String, String, AuthorisationScope...)}
 	 * @param scopes
-	 *            The list of authorisation scopes to be associated with the token
+	 *            The list of authorisation scopes to be associated with the accessToken
 	 */
 	public Token(final TokenResponse tokenResponse, final AuthorisationScope... scopes) {
 		this.athlete = tokenResponse.getAthlete();
-		this.token = tokenResponse.getAccessToken();
+		this.accessToken = tokenResponse.getAccessToken();
+		this.refreshToken = tokenResponse.getRefreshToken();
+		this.expiresAt = tokenResponse.getExpiresAt();
 		this.tokenType = tokenResponse.getTokenType();
 		this.scopes = Arrays.asList(scopes);
 		this.services = new HashMap<Class<? extends StravaService>, StravaService>();
@@ -173,11 +184,18 @@ public class Token {
 		} else if (!this.services.equals(other.services)) {
 			return false;
 		}
-		if (this.token == null) {
-			if (other.token != null) {
+		if (this.accessToken == null) {
+			if (other.accessToken != null) {
 				return false;
 			}
-		} else if (!this.token.equals(other.token)) {
+		} else if (!this.accessToken.equals(other.accessToken)) {
+			return false;
+		}
+		if (this.refreshToken == null) {
+			if (other.refreshToken != null) {
+				return false;
+			}
+		} else if (!this.refreshToken.equals(other.refreshToken)) {
 			return false;
 		}
 		if (this.tokenType == null) {
@@ -206,7 +224,7 @@ public class Token {
 
 	/**
 	 * <p>
-	 * Gets the service implementation of the required class from the token
+	 * Gets the service implementation of the required class from the accessToken
 	 * </p>
 	 *
 	 * @param <T>
@@ -228,10 +246,24 @@ public class Token {
 	}
 
 	/**
-	 * @return the token
+	 * @return the access Token
 	 */
-	public String getToken() {
-		return this.token;
+	public String getAccessToken() {
+		return this.accessToken;
+	}
+
+	/**
+	 * @return the refresh token
+	 */
+	public String getRefreshToken() {
+		return this.refreshToken;
+	}
+
+	/**
+	 * @return seconds since the Epoch when the provided access token will expire
+	 */
+	public long getExpiresAt() {
+		return this.expiresAt;
 	}
 
 	/**
@@ -251,7 +283,8 @@ public class Token {
 		result = (prime * result) + ((this.athlete == null) ? 0 : this.athlete.hashCode());
 		result = (prime * result) + ((this.scopes == null) ? 0 : this.scopes.hashCode());
 		result = (prime * result) + ((this.services == null) ? 0 : this.services.hashCode());
-		result = (prime * result) + ((this.token == null) ? 0 : this.token.hashCode());
+		result = (prime * result) + ((this.accessToken == null) ? 0 : this.accessToken.hashCode());
+		result = (prime * result) + ((this.refreshToken == null) ? 0 : this.refreshToken.hashCode());
 		result = (prime * result) + ((this.tokenType == null) ? 0 : this.tokenType.hashCode());
 		return result;
 	}
@@ -262,7 +295,7 @@ public class Token {
 	 * have subsequently been revoked by the user)
 	 * </p>
 	 *
-	 * @return <code>true</code> if the token contains the {@link AuthorisationScope#VIEW_PRIVATE}
+	 * @return <code>true</code> if the accessToken contains the {@link AuthorisationScope#VIEW_PRIVATE}
 	 */
 	public boolean hasViewPrivate() {
 		if ((this.scopes != null) && this.scopes.contains(AuthorisationScope.VIEW_PRIVATE)) {
@@ -273,11 +306,11 @@ public class Token {
 
 	/**
 	 * <p>
-	 * Validates that the token has write access (according to the scopes that it was granted on creation at least; it is quite possible that permissions have
+	 * Validates that the accessToken has write access (according to the scopes that it was granted on creation at least; it is quite possible that permissions have
 	 * subsequently been revoked by the user)
 	 * </p>
 	 *
-	 * @return <code>true</code> if the token contains the {@link AuthorisationScope#WRITE}
+	 * @return <code>true</code> if the accessToken contains the {@link AuthorisationScope#WRITE}
 	 */
 	public boolean hasWriteAccess() {
 		if ((this.scopes != null) && this.scopes.contains(AuthorisationScope.WRITE)) {
@@ -292,7 +325,7 @@ public class Token {
 	 * </p>
 	 *
 	 * @param class1
-	 *            The class of token to be removed
+	 *            The class of accessToken to be removed
 	 */
 	public void removeService(final Class<? extends StravaService> class1) {
 		this.services.remove(class1);
@@ -323,11 +356,27 @@ public class Token {
 	}
 
 	/**
-	 * @param token
-	 *            the token to set
+	 * @param accessToken
+	 *            the accessToken to set
 	 */
-	public void setToken(final String token) {
-		this.token = token;
+	public void setAccessToken(final String accessToken) {
+		this.accessToken = accessToken;
+	}
+
+	/**
+	 * @param refreshToken
+	 *            the refresh token to set
+	 */
+	public void setRefreshToken(final String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
+	/**
+	 * @param expiresAt
+	 *            seconds since the Epoch when the provided access token will expire.
+	 */
+	public void setExpiresAt(final long expiresAt) {
+		this.expiresAt = expiresAt;
 	}
 
 	/**
@@ -343,7 +392,9 @@ public class Token {
 	 */
 	@Override
 	public String toString() {
-		return "Token [athlete=" + this.athlete + ", token=" + this.token + ", scopes=" + this.scopes + ", services=" + this.services + ", tokenType=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+		return "Token [athlete=" + this.athlete + ", accessToken=" + this.accessToken + ", refreshToken=" + this.refreshToken +
+				LocalDateTime.ofEpochSecond(this.expiresAt, 0, ZoneOffset.UTC) +
+				", scopes=" + this.scopes + ", services=" + this.services + ", tokenType=" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 				+ this.tokenType + "]"; //$NON-NLS-1$
 	}
 

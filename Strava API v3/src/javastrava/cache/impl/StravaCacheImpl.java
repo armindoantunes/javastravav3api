@@ -67,7 +67,7 @@ public class StravaCacheImpl<T extends StravaCacheable<U>, U> implements StravaC
 	 * @return The group name, based on the token and the class being stored
 	 */
 	private String groupName() {
-		return this.class1.getName() + "::" + this.token.getToken(); //$NON-NLS-1$
+		return this.class1.getName() + "::" + this.token.getAccessToken(); //$NON-NLS-1$
 	}
 
 	/**
